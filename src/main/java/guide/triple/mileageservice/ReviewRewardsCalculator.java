@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ReviewRewardsCalculator {
-    private static int rewards = 0;
+    private int rewards = 0;
 
 
     public void calculate(ReviewEventReqDto eventDto) {
