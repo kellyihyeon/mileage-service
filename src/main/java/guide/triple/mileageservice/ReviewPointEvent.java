@@ -44,4 +44,8 @@ public class ReviewPointEvent {
     public int getTotalPoint() {
         return totalPoint;
     }
+
+    public List<Point> getPointHistory() {
+        return pointHistory;
+    }
 }

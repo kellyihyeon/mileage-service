@@ -39,4 +39,13 @@ public class Point {    // PointHistory
     public int hashCode() {
         return Objects.hash(amount, status, details);
     }
+
+    @Override
+    public String toString() {
+        return "Point{" +
+                "amount=" + amount +
+                ", status=" + status +
+                ", details=" + details +
+                '}';
+    }
 }
