@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PointCalculatorTest {
+public class PointTest {
 
-    private ReviewPointEvent reviewPointEvent;
+    private Point point;
 
 
     @BeforeEach
     void setUp() {
-        reviewPointEvent = new ReviewPointEvent(); // 한 유저의 포인트
+        point = new Point(); // 한 유저의 포인트
     }
 
     @Test
@@ -23,8 +23,8 @@ public class PointCalculatorTest {
     void 규정에_맞지않는_사진첨부() {
         ReviewEventReqDto attachedPhotoIsEmpty = ReviewEventReqDtoFixtureBuilder.builder().attachedPhotoIds(Collections.emptyList()).build();
 
-        reviewPointEvent.check(attachedPhotoIsEmpty);
-        List<Point> pointHistory = reviewPointEvent.getPointHistory();  // REVIEW
+        point.check(attachedPhotoIsEmpty);
+        List<PointHistory> pointHistory = point.getPointHistory();  // REVIEW
 
         Boolean existedPhotoPoint = pointHistory.stream()
                 .map(history -> PointDetails.PHOTO.equals(history.getDetails()))
@@ -39,8 +39,8 @@ public class PointCalculatorTest {
     void 규정에_맞지않는_리뷰내용() {
         ReviewEventReqDto contentIsNull = ReviewEventReqDtoFixtureBuilder.builder().content(null).build();
 
-        reviewPointEvent.check(contentIsNull);
-        List<Point> pointHistory = reviewPointEvent.getPointHistory();  // PHOTO
+        point.check(contentIsNull);
+        List<PointHistory> pointHistory = point.getPointHistory();  // PHOTO
 
         Boolean existedContentPoint = pointHistory.stream()
                 .map(history -> PointDetails.REVIEW.equals(history.getDetails()))
@@ -56,11 +56,11 @@ public class PointCalculatorTest {
         ReviewEventReqDto maybeZeroPoint = ReviewEventReqDtoFixtureBuilder.builder().
                 content(null).
                 attachedPhotoIds(Collections.emptyList())
-                .build();    // 괌 리뷰
+                .build();
 
-        reviewPointEvent.check(maybeZeroPoint);
+        point.check(maybeZeroPoint);
 
-        assertEquals(0, reviewPointEvent.getTotalPoint());
+        assertEquals(0, point.getTotalPoint());
     }
 
     @Test
@@ -68,18 +68,18 @@ public class PointCalculatorTest {
     void 내용과_사진이_모두_있는_경우() {
         ReviewEventReqDto maybeTwoPoints = ReviewEventReqDtoFixtureBuilder.builder().build();
 
-        reviewPointEvent.check(maybeTwoPoints);
+        point.check(maybeTwoPoints);
 
-        assertEquals(2, reviewPointEvent.getTotalPoint());
+        assertEquals(2, point.getTotalPoint());
     }
 
     @ParameterizedTest
     @MethodSource("dtoGenerator")
     @DisplayName("내용 작성 또는 사진 첨부가 있는 경우 보상 점수는 1점이다.")
     void 내용과_사진_둘_중_하나만_있는_경우(ReviewEventReqDto inputDto) {
-        reviewPointEvent.check(inputDto);
+        point.check(inputDto);
 
-        assertEquals(1, reviewPointEvent.getTotalPoint());
+        assertEquals(1, point.getTotalPoint());
     }
 
 
