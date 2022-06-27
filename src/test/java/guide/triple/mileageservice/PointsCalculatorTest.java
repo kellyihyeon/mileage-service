@@ -10,6 +10,9 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PointsCalculatorTest {
+
+    private List<Points> points;
+
     private static String type;
     private static ReviewEventAction action;
     private static String reviewId;
@@ -27,6 +30,34 @@ public class PointsCalculatorTest {
         attachedPhotoIds = Arrays.asList("e4d1a64e-a531-46de-88d0-ff0ed70c0bb8", "afb0cef2-851d-4a50-bb07-9cc15cbdc332");
         userId = "3ede0ef2-92b7-4817-a5f3-0c575361f745";
         placeId = "2e4baf1c-5acb-4efb-a1af-eddada31b00f";
+
+        ReviewEventReqDto dto = ReviewEventReqDtoFixtureBuilder.builder().build();
+        ReviewPointsCalculator calc = new ReviewPointsCalculator();
+        points = calc.check(dto);
+    }
+
+    @Test
+    @DisplayName("사진 첨부가 규정에 맞지 않으면 포인트를 부여하지 않는다.")
+    void 규정에_맞지않는_사진첨부() {
+        ReviewEventReqDto dto = ReviewEventReqDtoFixtureBuilder.builder().attachedPhotoIds(Collections.emptyList()).build();
+        ReviewPointsCalculator calc = new ReviewPointsCalculator();
+        points = calc.check(dto);
+
+        Points pointWithoutPhoto = this.points.get(0);
+
+        assertNotEquals(PointDetails.PHOTO, pointWithoutPhoto.getDetails());
+    }
+
+    @Test
+    @DisplayName("리뷰 내용이 규정에 맞지 않으면 포인트를 부여하지 않는다.")
+    void 규정에_맞지않는_리뷰내용() {
+        ReviewEventReqDto dto = ReviewEventReqDtoFixtureBuilder.builder().content(null).build();
+
+        ReviewPointsCalculator calc = new ReviewPointsCalculator();
+        points = calc.check(dto);
+        Points pointWithoutContent = this.points.get(0);
+
+        assertNotEquals(PointDetails.REVIEW, pointWithoutContent.getDetails());
     }
 
     @Test

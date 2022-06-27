@@ -1,7 +1,6 @@
 package guide.triple.mileageservice;
 
 import org.junit.jupiter.api.*;
-import java.util.Collections;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,30 +13,6 @@ public class PointsHistoryTest {
         ReviewEventReqDto dto = ReviewEventReqDtoFixtureBuilder.builder().build();
         ReviewPointsCalculator calc = new ReviewPointsCalculator();
         points = calc.check(dto);
-    }
-
-    @Test
-    @DisplayName("사진 첨부가 규정에 맞지 않으면 포인트를 부여하지 않는다.")
-    void 규정에_맞지않는_사진첨부() {
-        ReviewEventReqDto dto = ReviewEventReqDtoFixtureBuilder.builder().attachedPhotoIds(Collections.emptyList()).build();
-        ReviewPointsCalculator calc = new ReviewPointsCalculator();
-        points = calc.check(dto);
-
-        Points pointWithoutPhoto = this.points.get(0);
-
-        assertNotEquals(PointDetails.PHOTO, pointWithoutPhoto.getDetails());
-    }
-
-    @Test
-    @DisplayName("리뷰 내용이 규정에 맞지 않으면 포인트를 부여하지 않는다.")
-    void 규정에_맞지않는_리뷰내용() {
-        ReviewEventReqDto dto = ReviewEventReqDtoFixtureBuilder.builder().content(null).build();
-        ReviewPointsCalculator calc = new ReviewPointsCalculator();
-        points = calc.check(dto);
-
-        Points pointWithoutContent = this.points.get(0);
-
-        assertNotEquals(PointDetails.REVIEW, pointWithoutContent.getDetails());
     }
 
     @Test
