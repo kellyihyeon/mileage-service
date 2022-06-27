@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ReviewRewardsCalculatorTest {
+public class PointsCalculatorTest {
     private static String type;
     private static ReviewEventAction action;
     private static String reviewId;
@@ -36,9 +36,9 @@ public class ReviewRewardsCalculatorTest {
         ReviewEventReqDto eventDto = new ReviewEventReqDto(type, action, reviewId, null, Collections.emptyList(), userId, placeId);
         //when
         String reviewEvent = eventDto.getType();
-        ReviewRewardsCalculator rewardsCalculator = new ReviewRewardsCalculator();
+        ReviewPointsCalculator rewardsCalculator = new ReviewPointsCalculator();
         rewardsCalculator.calculate(eventDto);
-        int rewards = rewardsCalculator.getRewards();
+        int rewards = rewardsCalculator.getTotalPoints();
         //then
         assertEquals(0, rewards);
     }
@@ -49,10 +49,10 @@ public class ReviewRewardsCalculatorTest {
         //given
         ReviewEventReqDto eventDto = new ReviewEventReqDto(type, action, reviewId, content, attachedPhotoIds, userId, placeId);
         //when
-        ReviewRewardsCalculator rewardsCalculator = new ReviewRewardsCalculator();
-        rewardsCalculator.calculate(eventDto);
+        ReviewPointsCalculator rewardsCalculator = new ReviewPointsCalculator();
+        rewardsCalculator.calculate(eventDto);  // 총 합계를 계산함 (2점)
         //then
-        assertEquals(2, rewardsCalculator.getRewards());
+        assertEquals(2, rewardsCalculator.getTotalPoints());
     }
 
     @ParameterizedTest
@@ -60,10 +60,10 @@ public class ReviewRewardsCalculatorTest {
     @DisplayName("내용 작성 또는 사진 첨부가 있는 경우 보상 점수는 1점이다.")
     void 내용과_사진_둘_중_하나만_있는_경우(ReviewEventReqDto inputDto) {
         //when
-        ReviewRewardsCalculator rewardsCalculator = new ReviewRewardsCalculator();
+        ReviewPointsCalculator rewardsCalculator = new ReviewPointsCalculator();
         rewardsCalculator.calculate(inputDto);
         //then
-        assertEquals(1, rewardsCalculator.getRewards());
+        assertEquals(1, rewardsCalculator.getTotalPoints());
     }
 
 

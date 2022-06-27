@@ -1,5 +1,5 @@
 package guide.triple.mileageservice;
 
 public enum ReviewEventAction {
-    ADD,
+    ADD, MOD,
 }
