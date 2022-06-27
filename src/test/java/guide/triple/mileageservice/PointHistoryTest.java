@@ -4,22 +4,22 @@ import org.junit.jupiter.api.*;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PointsHistoryTest {
+public class PointHistoryTest {
 
-    private List<Points> points;
+    private List<Point> points;
 
     @BeforeEach
     void setUp() {
         ReviewEventReqDto dto = ReviewEventReqDtoFixtureBuilder.builder().build();
-        ReviewPointsCalculator calc = new ReviewPointsCalculator();
+        ReviewPointEvent calc = new ReviewPointEvent();
         points = calc.check(dto);
     }
 
     @Test
     @DisplayName("리뷰 작성 및 사진 첨부 시 각 (1포인트, PLUS) 이력이 남는다.")
     void 리뷰작성_및_사진첨부_이력() {
-        Points contentPoint = new Points(1, PointStatus.PLUS, PointDetails.REVIEW);
-        Points photoPoint = new Points(1, PointStatus.PLUS, PointDetails.PHOTO);
+        Point contentPoint = new Point(1, PointStatus.ADDED, PointDetails.REVIEW);
+        Point photoPoint = new Point(1, PointStatus.ADDED, PointDetails.PHOTO);
 
         int CONTENT = 0;
         int PHOTO = 1;
@@ -31,10 +31,10 @@ public class PointsHistoryTest {
     @Test
     @DisplayName("리뷰 작성시 (1포인트, PLUS) 이력이 남는다.")
      void 리뷰작성_이력() {
-        Points point = points.get(0);
+        Point point = points.get(0);
 
-        assertEquals(1, point.getPoint());
-        assertEquals(PointStatus.PLUS, point.getPointStatus());
+        assertEquals(1, point.getAmount());
+        assertEquals(PointStatus.ADDED, point.getPointStatus());
     }
 
 }

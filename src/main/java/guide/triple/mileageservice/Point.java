@@ -2,20 +2,21 @@ package guide.triple.mileageservice;
 
 import java.util.Objects;
 
-public class Points {
+public class Point {    // PointHistory
 
-    private final Integer point;
+    private final Integer amount;
     private final PointStatus status;
     private final PointDetails details;
 
-    public Points(int point, PointStatus status, PointDetails details) {
-        this.point = point;
+
+    public Point(int amount, PointStatus status, PointDetails details) {
+        this.amount = amount;
         this.status = status;
         this.details = details;
     }
 
-    public Integer getPoint() {
-        return point;
+    public Integer getAmount() {
+        return amount;
     }
 
     public PointStatus getPointStatus() {
@@ -30,12 +31,12 @@ public class Points {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Points points = (Points) o;
-        return Objects.equals(point, points.point) && status == points.status && details == points.details;
+        Point point = (Point) o;
+        return Objects.equals(this.amount, point.amount) && status == point.status && details == point.details;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(point, status, details);
+        return Objects.hash(amount, status, details);
     }
 }
