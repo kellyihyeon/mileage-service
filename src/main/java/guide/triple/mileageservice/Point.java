@@ -1,50 +1,61 @@
 package guide.triple.mileageservice;
 
 import lombok.extern.slf4j.Slf4j;
-import java.util.ArrayList;
+import org.hibernate.annotations.ColumnDefault;
+import javax.persistence.*;
 import java.util.List;
 
 @Slf4j
+@Entity
 public class Point {
 
-    private int totalPoint = 0;
-    private final List<RewardsPoint> history = new ArrayList<>();
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    private String userId;
 
-    /**
-     * dto 를 검사해서 적립해줄 건지 취소할 건지
-     * @param dto contains fields like type, action, reviewId, content, attachedPhotoIds, userId, placeId,
-     * @return    maybe modified.
-     */
-    public List<RewardsPoint> check(ReviewEventReqDto dto) {
-        if (hasContent(dto)) {
-            history.add(new RewardsPoint(1, PointStatus.ADDED, PointDetails.REVIEW));    //추가: reviewId
-            totalPoint += 1;
-            log.info("[review rewards] 리뷰 내용 작성: 1점[글자수 {}자]", dto.getContent().length());
+    @OneToMany(mappedBy = "point")
+    private List<PointLog> history;
+
+    @ColumnDefault("0")
+    private int totalPoint;
+
+    // check 메서드
+
+    public Point actionCheck(ReviewEvent reviewEvent) { //checkByAction
+
+        //1.dto action : DEL (리뷰_작성) -> 포인트 취소 연산
+        if (reviewEvent.isActionDelete()) {
+
         }
 
-        if (hasPhoto(dto)) {
-            history.add(new RewardsPoint(1, PointStatus.ADDED, PointDetails.PHOTO));
-            totalPoint += 1;
-            log.info("[review rewards] 사진 첨부: 1점[{}]", !dto.getAttachedPhotoIds().isEmpty());
+        //1.dto action : MOD (리뷰_수정) -> 포인트 적립 or 취소 연산
+        if (reviewEvent.isActionMod()) {
+
         }
 
-        return history;
+        if (reviewEvent.isActionAdd()) {
+            if (reviewEvent.hasContent()) {
+                addPoint(PointDetails.REVIEW);
+            }
+
+            if (reviewEvent.hasAttachedPhoto()) {
+                addPoint(PointDetails.PHOTO);
+            }
+        }
+
+        return null;
     }
 
-    private boolean hasPhoto(ReviewEventReqDto dto) {
-        return !dto.getAttachedPhotoIds().isEmpty();
-    }
-
-    private boolean hasContent(ReviewEventReqDto dto) {
-        return dto.getContent() != null && dto.getContent().trim().length() >= 1;
-    }
-
-    public int getTotalPoint() {
-        return totalPoint;
-    }
-
-    public List<RewardsPoint> getPointHistory() {
-        return history;
+    private void addPoint(PointDetails details) {
+        PointLog logWithContent = PointLog.builder()
+                .point(this)
+                .amount(1)
+                .status(PointStatus.ADDED)
+                .details(details)
+                .build();
     }
 }
+
+

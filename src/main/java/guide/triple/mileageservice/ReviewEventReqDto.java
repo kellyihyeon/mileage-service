@@ -32,6 +32,17 @@ public class ReviewEventReqDto {
         this.attachedPhotoIds = attachedPhotoIds;
         this.userId = userId;
         this.placeId = placeId;
+    }
 
+    public ReviewEvent toEntity() {
+        return ReviewEvent.builder()
+                            .type(type)
+                            .action(action)
+                            .reviewId(reviewId)
+                            .content(content)
+                            .attachedPhotoIds(attachedPhotoIds)
+                            .userId(userId)
+                            .placeId(placeId)
+                            .build();
     }
 }
