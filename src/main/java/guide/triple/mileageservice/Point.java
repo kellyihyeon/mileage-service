@@ -21,39 +21,30 @@ public class Point {
     @ColumnDefault("0")
     private int totalPoint;
 
-    // check 메서드
 
-    public Point actionCheck(ReviewEvent reviewEvent) { //checkByAction
 
-        //1.dto action : DEL (리뷰_작성) -> 포인트 취소 연산
-        if (reviewEvent.isActionDelete()) {
-
-        }
-
-        //1.dto action : MOD (리뷰_수정) -> 포인트 적립 or 취소 연산
-        if (reviewEvent.isActionMod()) {
-
-        }
-
-        if (reviewEvent.isActionAdd()) {
-            if (reviewEvent.hasContent()) {
-                addPoint(PointDetails.REVIEW);
-            }
-
-            if (reviewEvent.hasAttachedPhoto()) {
-                addPoint(PointDetails.PHOTO);
-            }
-        }
-
-        return null;
+    public PointLog plusPointByPhoto(ReviewEvent event) {
+        plusPoint();
+        return createPointLog(PointDetails.PHOTO, event.getPlaceId());
     }
 
-    private void addPoint(PointDetails details) {
-        PointLog logWithContent = PointLog.builder()
+    public PointLog plusPointByContent(ReviewEvent event) {
+        plusPoint();
+        return createPointLog(PointDetails.REVIEW, event.getPlaceId());
+    }
+
+    private void plusPoint() {
+        totalPoint += 1;
+    }
+
+    private PointLog createPointLog(PointDetails details, String placeId) {
+        return PointLog.builder()
                 .point(this)
                 .amount(1)
                 .status(PointStatus.ADDED)
                 .details(details)
+                .placeId(placeId)
+                .pointCheck(true)
                 .build();
     }
 }

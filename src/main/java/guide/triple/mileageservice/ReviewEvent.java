@@ -3,8 +3,10 @@ package guide.triple.mileageservice;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import java.util.List;
 
+@ToString
 @Getter
 @Builder
 @RequiredArgsConstructor
