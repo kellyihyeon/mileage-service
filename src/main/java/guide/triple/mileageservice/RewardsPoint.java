@@ -2,14 +2,14 @@ package guide.triple.mileageservice;
 
 import java.util.Objects;
 
-public class PointHistory {
-
+public class RewardsPoint {
+    // reviewId
     private final Integer amount;
     private final PointStatus status;
     private final PointDetails details;
 
 
-    public PointHistory(int amount, PointStatus status, PointDetails details) {
+    public RewardsPoint(int amount, PointStatus status, PointDetails details) {
         this.amount = amount;
         this.status = status;
         this.details = details;
@@ -31,8 +31,8 @@ public class PointHistory {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PointHistory pointHistory = (PointHistory) o;
-        return Objects.equals(this.amount, pointHistory.amount) && status == pointHistory.status && details == pointHistory.details;
+        RewardsPoint rewardsPoint = (RewardsPoint) o;
+        return Objects.equals(this.amount, rewardsPoint.amount) && status == rewardsPoint.status && details == rewardsPoint.details;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class PointHistory {
 
     @Override
     public String toString() {
-        return "PointHistory{" +
+        return "RewardsPoint{" +
                 "amount=" + amount +
                 ", status=" + status +
                 ", details=" + details +

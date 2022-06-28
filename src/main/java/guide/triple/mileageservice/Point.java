@@ -7,9 +7,8 @@ import java.util.List;
 @Slf4j
 public class Point {
 
-    private final List<PointHistory> pointHistory = new ArrayList<>();
-
     private int totalPoint = 0;
+    private final List<RewardsPoint> history = new ArrayList<>();
 
 
     /**
@@ -17,20 +16,20 @@ public class Point {
      * @param dto contains fields like type, action, reviewId, content, attachedPhotoIds, userId, placeId,
      * @return    maybe modified.
      */
-    public List<PointHistory> check(ReviewEventReqDto dto) {
+    public List<RewardsPoint> check(ReviewEventReqDto dto) {
         if (hasContent(dto)) {
-            pointHistory.add(new PointHistory(1, PointStatus.ADDED, PointDetails.REVIEW));    //추가: reviewId
+            history.add(new RewardsPoint(1, PointStatus.ADDED, PointDetails.REVIEW));    //추가: reviewId
             totalPoint += 1;
             log.info("[review rewards] 리뷰 내용 작성: 1점[글자수 {}자]", dto.getContent().length());
         }
 
         if (hasPhoto(dto)) {
-            pointHistory.add(new PointHistory(1, PointStatus.ADDED, PointDetails.PHOTO));
+            history.add(new RewardsPoint(1, PointStatus.ADDED, PointDetails.PHOTO));
             totalPoint += 1;
             log.info("[review rewards] 사진 첨부: 1점[{}]", !dto.getAttachedPhotoIds().isEmpty());
         }
 
-        return pointHistory;
+        return history;
     }
 
     private boolean hasPhoto(ReviewEventReqDto dto) {
@@ -45,7 +44,7 @@ public class Point {
         return totalPoint;
     }
 
-    public List<PointHistory> getPointHistory() {
-        return pointHistory;
+    public List<RewardsPoint> getPointHistory() {
+        return history;
     }
 }

@@ -10,12 +10,34 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PointTest {
 
-    private Point point;
+    private Point point;   // 한 유저의 포인트
 
 
     @BeforeEach
     void setUp() {
-        point = new Point(); // 한 유저의 포인트
+        point = new Point();
+    }
+
+    @Test
+    @DisplayName("첨부한 사진을 모두 삭제하면 포인트 1점을 회수한다.")
+    @Disabled("restart")
+    void 첨부한_사진_모두_삭제() {
+        //given
+        // 리뷰 작성(글과 사진 모두 있음)
+        ReviewEventReqDto dto = ReviewEventReqDtoFixtureBuilder.builder().build();
+        point.check(dto);
+        int totalPoint = point.getTotalPoint();
+        // 리뷰 수정(사진을 삭제함)
+        ReviewEventReqDto deleteAllPhotosDto = ReviewEventReqDtoFixtureBuilder.builder()
+                .action(ReviewEventAction.MOD)
+                .attachedPhotoIds(Collections.emptyList())
+                .build();
+        //when
+        List<RewardsPoint> pointHistories = point.check(deleteAllPhotosDto);    //(1점, 취소, photo)
+        int changedTotalPoint = point.getTotalPoint();
+        //then
+        assertEquals(2, totalPoint);
+        assertEquals(1, changedTotalPoint); //
     }
 
     @Test
@@ -24,9 +46,9 @@ public class PointTest {
         ReviewEventReqDto attachedPhotoIsEmpty = ReviewEventReqDtoFixtureBuilder.builder().attachedPhotoIds(Collections.emptyList()).build();
 
         point.check(attachedPhotoIsEmpty);
-        List<PointHistory> pointHistory = point.getPointHistory();  // REVIEW
+        List<RewardsPoint> rewardsPoint = point.getPointHistory();  // REVIEW
 
-        Boolean existedPhotoPoint = pointHistory.stream()
+        Boolean existedPhotoPoint = rewardsPoint.stream()
                 .map(history -> PointDetails.PHOTO.equals(history.getDetails()))
                 .findFirst()
                 .orElse(false);
@@ -40,9 +62,9 @@ public class PointTest {
         ReviewEventReqDto contentIsNull = ReviewEventReqDtoFixtureBuilder.builder().content(null).build();
 
         point.check(contentIsNull);
-        List<PointHistory> pointHistory = point.getPointHistory();  // PHOTO
+        List<RewardsPoint> rewardsPoint = point.getPointHistory();  // PHOTO
 
-        Boolean existedContentPoint = pointHistory.stream()
+        Boolean existedContentPoint = rewardsPoint.stream()
                 .map(history -> PointDetails.REVIEW.equals(history.getDetails()))
                 .findFirst()
                 .orElse(false);

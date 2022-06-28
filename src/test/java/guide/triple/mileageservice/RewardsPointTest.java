@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PointHistoryTest {
+public class RewardsPointTest {
 
     private Point point;
 
@@ -28,10 +28,10 @@ public class PointHistoryTest {
         ReviewEventReqDto dto = ReviewEventReqDtoFixtureBuilder.builder().build();
 
         point.check(dto);
-        List<PointHistory> pointHistories = point.getPointHistory();
+        List<RewardsPoint> pointHistories = point.getPointHistory();
 
-        assertEquals(new PointHistory(1, PointStatus.ADDED, PointDetails.REVIEW), pointHistories.get(CONTENT));
-        assertEquals(new PointHistory(1, PointStatus.ADDED, PointDetails.PHOTO), pointHistories.get(PHOTO));
+        assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.REVIEW), pointHistories.get(CONTENT));
+        assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.PHOTO), pointHistories.get(PHOTO));
     }
 
     @ParameterizedTest
@@ -39,15 +39,15 @@ public class PointHistoryTest {
     @DisplayName("리뷰작성 또는 사진첨부 시 (1점, 적립, REVIEW) 또는 (1점, 적립, PHOTO) 이력이 남는다.")
     void 리뷰작성_또는_사진첨부_이력(ReviewEventReqDto inputDto, int index) {
         point.check(inputDto);
-        List<PointHistory> pointHistories = point.getPointHistory();
+        List<RewardsPoint> pointHistories = point.getPointHistory();
 
         final int HISTORY_SIZE = 0;
         if (index == 0) {
-            assertEquals(new PointHistory(1, PointStatus.ADDED, PointDetails.REVIEW), pointHistories.get(HISTORY_SIZE));
+            assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.REVIEW), pointHistories.get(HISTORY_SIZE));
         }
 
         if (index == 1) {
-            assertEquals(new PointHistory(1, PointStatus.ADDED, PointDetails.PHOTO), pointHistories.get(HISTORY_SIZE));
+            assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.PHOTO), pointHistories.get(HISTORY_SIZE));
         }
     }
 

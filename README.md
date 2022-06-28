@@ -180,7 +180,7 @@ String status;  // 적립, 회수, 사용
 String reviewId;
 List<Points> history; // 포인트 히스토리
 ```
-- Users 는 pointHistory id 를 가지고 있다.
+- Users 는 rewardsPoint id 를 가지고 있다.
 - POST /events API 호출 시 (포인트 적립 API)
     - ADD, MOD, DELETE 의 경우 비즈니스 로직 과정 중 점수 계산이 이루어짐.
     - A의 리뷰 작성 결과 2점을 획득했을 때, 포인트 객체는?
