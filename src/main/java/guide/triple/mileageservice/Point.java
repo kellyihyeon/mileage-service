@@ -30,7 +30,7 @@ public class Point {
 
     public PointLog plusPointByContent(ReviewEvent event) {
         plusPoint();
-        return createPointLog(PointDetails.REVIEW, event.getPlaceId());
+        return createPointLog(PointDetails.CONTENT, event.getPlaceId());
     }
 
     private void plusPoint() {

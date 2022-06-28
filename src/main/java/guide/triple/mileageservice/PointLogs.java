@@ -15,4 +15,17 @@ public class PointLogs {
     public String getPlaceId() {
         return pointLogs.stream().map(PointLog::getPlaceId).findAny().orElse(null);
     }
+
+    public boolean hasLogByContent() {
+        return pointLogs.stream().anyMatch(pointLog -> PointDetails.CONTENT.equals(pointLog.getDetails()));
+    }
+
+    public boolean isChecked() {
+        return pointLogs.stream().map(PointLog::isPointCheck).findFirst().orElse(false);
+    }
+
+    public boolean hasLogByPhoto() {
+        return pointLogs.stream().anyMatch(pointLog -> PointDetails.PHOTO.equals(pointLog.getDetails()));
+    }
+
 }

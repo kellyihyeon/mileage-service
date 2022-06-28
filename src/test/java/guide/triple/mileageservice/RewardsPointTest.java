@@ -30,7 +30,7 @@ public class RewardsPointTest {
         point.check(dto);
         List<RewardsPoint> pointHistories = point.getPointHistory();
 
-        assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.REVIEW), pointHistories.get(CONTENT));
+        assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.CONTENT), pointHistories.get(CONTENT));
         assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.PHOTO), pointHistories.get(PHOTO));
     }
 
@@ -43,7 +43,7 @@ public class RewardsPointTest {
 
         final int HISTORY_SIZE = 0;
         if (index == 0) {
-            assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.REVIEW), pointHistories.get(HISTORY_SIZE));
+            assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.CONTENT), pointHistories.get(HISTORY_SIZE));
         }
 
         if (index == 1) {

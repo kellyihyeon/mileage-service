@@ -65,7 +65,7 @@ public class PointTest {
         List<RewardsPoint> rewardsPoint = point.getPointHistory();  // PHOTO
 
         Boolean existedContentPoint = rewardsPoint.stream()
-                .map(history -> PointDetails.REVIEW.equals(history.getDetails()))
+                .map(history -> PointDetails.CONTENT.equals(history.getDetails()))
                 .findFirst()
                 .orElse(false);
 
