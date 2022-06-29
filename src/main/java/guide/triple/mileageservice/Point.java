@@ -52,6 +52,11 @@ public class Point {
         return createPointLog(PointDetails.CONTENT, event.getPlaceId(), PointStatus.CANCELED);
     }
 
+    public PointLog minusPointByPhoto(ReviewEvent event) {
+        minusPoint();
+        return createPointLog(PointDetails.PHOTO, event.getPlaceId(), PointStatus.CANCELED);
+    }
+
     private void minusPoint() {
         totalPoint -= 1;
     }

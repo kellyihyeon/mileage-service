@@ -28,4 +28,8 @@ public class PointLogs {
     public List<PointLog> getLogsByContent() {
         return pointLogs.stream().filter(pointLog -> PointDetails.CONTENT.equals(pointLog.getDetails())).collect(Collectors.toList());
     }
+
+    public List<PointLog> getLogsByPhoto() {
+        return pointLogs.stream().filter(pointLog -> PointDetails.PHOTO.equals(pointLog.getDetails())).collect(Collectors.toList());
+    }
 }

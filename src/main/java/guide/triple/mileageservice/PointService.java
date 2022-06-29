@@ -17,7 +17,6 @@ public class PointService {         //PointEventService
     /**
      * todo
      * 한 장소에 하나의 리뷰만 쓸 수 있는 로직 추가 - ADD 두 번 요청 시 Exception !
-     * 포인트 취소시키는 로직 짜자.
      */
     public void pointEvent(ReviewEvent reviewEvent) {
         Point point = pointRep.findByUserId(reviewEvent.getUserId());
@@ -26,23 +25,41 @@ public class PointService {         //PointEventService
             List<PointLog> pointLogs = pointLogRep.findByPlaceId(reviewEvent.getPlaceId()); // 검색 인덱스 지정
             PointLogs pointTransactionLogs = new PointLogs(pointLogs);
 
-            List<PointLog> contentLogs = pointTransactionLogs.getLogsByContent();
-            for (PointLog contentLog : contentLogs) {
-                log.info("[MOD] content log is existed. status is {}.", contentLog.getStatus());
-                if (contentLog.statusIsAdded()) {
-                    processMinusContentPoint(point, reviewEvent);
-                } else {  // CANCELED
-                    processPlusContentPoint(point, reviewEvent);
-                }
-            }
-
+            checkContentProcess(pointTransactionLogs.getLogsByContent(), point, reviewEvent);
+            checkPhotoProcess(pointTransactionLogs.getLogsByPhoto(), point, reviewEvent);
         }
 
         if (reviewEvent.isActionAdd()) {
             processPlusContentPoint(point, reviewEvent);
-            processPhotoPoint(point, reviewEvent);
+            processPlusPhotoPoint(point, reviewEvent);
         }
 
+    }
+
+    private void checkContentProcess(List<PointLog> contentLogs, Point point, ReviewEvent reviewEvent) {
+        for (PointLog contentLog : contentLogs) {
+            if (contentLog.statusIsAdded()) {
+                processMinusContentPoint(point, reviewEvent);
+            } else {  // CANCELED
+                processPlusContentPoint(point, reviewEvent);
+            }
+        }
+    }
+
+    private void checkPhotoProcess(List<PointLog> photoLogs, Point point, ReviewEvent reviewEvent) {
+        for (PointLog photoLog : photoLogs) {
+            if (photoLog.statusIsAdded()) {
+                processMinusPhotoPoint(point, reviewEvent);
+            } else {
+                processPlusPhotoPoint(point, reviewEvent);
+            }
+        }
+    }
+
+    private void processMinusPhotoPoint(Point point, ReviewEvent reviewEvent) {
+        if (!reviewEvent.hasAttachedPhoto()) {
+            pointLogRep.save(point.minusPointByPhoto(reviewEvent));
+        }
     }
 
     private void processMinusContentPoint(Point point, ReviewEvent reviewEvent) {
@@ -52,10 +69,9 @@ public class PointService {         //PointEventService
         }
     }
 
-    private void processPhotoPoint(Point point, ReviewEvent reviewEvent) {
+    private void processPlusPhotoPoint(Point point, ReviewEvent reviewEvent) {
         if (reviewEvent.hasAttachedPhoto()) {
-            PointLog logWithPhoto = point.plusPointByPhoto(reviewEvent);
-            pointLogRep.save(logWithPhoto);
+            pointLogRep.save(point.plusPointByPhoto(reviewEvent));
         }
     }
 
