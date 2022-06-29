@@ -1,10 +1,13 @@
 package guide.triple.mileageservice;
 
+import guide.triple.mileageservice.reviewevent.entity.ReviewEvent;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.ColumnDefault;
 import javax.persistence.*;
 import java.util.List;
 
+@Getter
 @Slf4j
 @Entity
 public class Point {
@@ -59,6 +62,16 @@ public class Point {
 
     private void minusPoint() {
         totalPoint -= 1;
+    }
+
+    public PointLog plusPointByFirstReview(ReviewEvent event) {
+        plusPoint();
+        return createPointLog(PointDetails.FIRST_REVIEW, event.getPlaceId(), PointStatus.ADDED);
+    }
+
+    public PointLog minusPointByFirstReview(ReviewEvent event) {
+        minusPoint();
+        return createPointLog(PointDetails.FIRST_REVIEW, event.getPlaceId(), PointStatus.CANCELED);
     }
 }
 

@@ -1,5 +1,6 @@
 package guide.triple.mileageservice;
 
+import guide.triple.mileageservice.reviewevent.dto.ReviewEventReqDto;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

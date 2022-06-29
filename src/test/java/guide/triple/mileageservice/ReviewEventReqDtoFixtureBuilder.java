@@ -1,6 +1,9 @@
 package guide.triple.mileageservice;
 
 
+import guide.triple.mileageservice.reviewevent.dto.ReviewEventReqDto;
+import guide.triple.mileageservice.reviewevent.entity.ReviewEventAction;
+
 import java.util.Arrays;
 import java.util.List;
 

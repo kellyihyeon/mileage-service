@@ -1,6 +1,6 @@
 package guide.triple.mileageservice;
 
 public enum PointDetails {
-    CONTENT, PHOTO
+    CONTENT, FIRST_REVIEW, PHOTO
 
 }

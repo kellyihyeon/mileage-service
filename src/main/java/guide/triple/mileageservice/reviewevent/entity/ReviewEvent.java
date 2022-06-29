@@ -1,4 +1,4 @@
-package guide.triple.mileageservice;
+package guide.triple.mileageservice.reviewevent.entity;
 
 import lombok.Builder;
 import lombok.Getter;

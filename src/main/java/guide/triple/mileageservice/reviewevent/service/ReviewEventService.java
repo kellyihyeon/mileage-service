@@ -1,5 +1,7 @@
-package guide.triple.mileageservice;
+package guide.triple.mileageservice.reviewevent.service;
 
+import guide.triple.mileageservice.*;
+import guide.triple.mileageservice.reviewevent.entity.ReviewEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,19 +10,15 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class PointService {         //PointEventService
+public class ReviewEventService {
 
     private final PointRepository pointRep;
     private final PointLogRepository pointLogRep;
 
 
-    /**
-     * todo
-     * 한 장소에 하나의 리뷰만 쓸 수 있는 로직 추가 - ADD 두 번 요청 시 Exception !
-     */
     public void pointEvent(ReviewEvent reviewEvent) {
         Point point = pointRep.findByUserId(reviewEvent.getUserId());
-        List<PointLog> pointLogs = pointLogRep.findByPlaceId(reviewEvent.getPlaceId()); // 검색 인덱스 지정
+        List<PointLog> pointLogs = pointLogRep.findByPlaceIdAndPointId(reviewEvent.getPlaceId(), point.getId());
         PointLogs pointTransactionLogs = new PointLogs(pointLogs);
 
         if (reviewEvent.actionIsDelete()) {
@@ -36,6 +34,12 @@ public class PointService {         //PointEventService
                 }
             }
 
+            for (PointLog firstReviewLog : pointTransactionLogs.getLogsByFirstReview()) {
+                if (pointTransactionLogs.pointTxStatusIsAdded()) {
+                    processMinusFirstReviewPoint(point, reviewEvent);
+                }
+            }
+
         }
 
         if (reviewEvent.isActionMod()) {
@@ -44,11 +48,24 @@ public class PointService {         //PointEventService
         }
 
         if (reviewEvent.isActionAdd()) {
+            if (!pointLogRep.existsByPlaceId(reviewEvent.getPlaceId())) {
+                processPlusFirstReviewPoint(point, reviewEvent);
+            }
+
             if (!pointTransactionLogs.pointTxStatusIsAdded()) {
                 processPlusContentPoint(point, reviewEvent);
                 processPlusPhotoPoint(point, reviewEvent);
             }
         }
+
+    }
+
+    private void processMinusFirstReviewPoint(Point point, ReviewEvent reviewEvent) {
+        pointLogRep.save(point.minusPointByFirstReview(reviewEvent));
+    }
+
+    private void processPlusFirstReviewPoint(Point point, ReviewEvent reviewEvent) {
+        pointLogRep.save(point.plusPointByFirstReview(reviewEvent));
 
     }
 

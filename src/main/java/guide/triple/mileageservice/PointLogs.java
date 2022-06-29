@@ -50,4 +50,8 @@ public class PointLogs {
     public boolean pointTxStatusIsAdded() {
         return PointStatus.ADDED.equals(getPointTxStatus());
     }
+
+    public List<PointLog> getLogsByFirstReview() {
+        return pointLogs.stream().filter(pointLog -> PointDetails.FIRST_REVIEW.equals(pointLog.getDetails())).collect(Collectors.toList());
+    }
 }
