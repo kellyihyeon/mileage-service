@@ -44,8 +44,10 @@ public class PointService {         //PointEventService
         }
 
         if (reviewEvent.isActionAdd()) {
-            processPlusContentPoint(point, reviewEvent);
-            processPlusPhotoPoint(point, reviewEvent);
+            if (!pointTransactionLogs.pointTxStatusIsAdded()) {
+                processPlusContentPoint(point, reviewEvent);
+                processPlusPhotoPoint(point, reviewEvent);
+            }
         }
 
     }
@@ -54,7 +56,7 @@ public class PointService {         //PointEventService
         for (PointLog contentLog : contentLogs) {
             if (contentLog.statusIsAdded()) {
                 processMinusContentPoint(point, reviewEvent);
-            } else {  // CANCELED
+            } else {
                 processPlusContentPoint(point, reviewEvent);
             }
         }

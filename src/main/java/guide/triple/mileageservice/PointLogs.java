@@ -9,6 +9,7 @@ public class PointLogs {
 
     private final List<PointLog> pointLogs;
 
+
     public PointLogs(List<PointLog> pointLogs) {
         this.pointLogs = pointLogs;
     }
