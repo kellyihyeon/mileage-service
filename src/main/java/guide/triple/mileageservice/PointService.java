@@ -20,11 +20,25 @@ public class PointService {         //PointEventService
      */
     public void pointEvent(ReviewEvent reviewEvent) {
         Point point = pointRep.findByUserId(reviewEvent.getUserId());
+        List<PointLog> pointLogs = pointLogRep.findByPlaceId(reviewEvent.getPlaceId()); // 검색 인덱스 지정
+        PointLogs pointTransactionLogs = new PointLogs(pointLogs);
+
+        if (reviewEvent.actionIsDelete()) {
+            for (PointLog contentLog : pointTransactionLogs.getLogsByContent()) {
+                if (pointTransactionLogs.pointTxStatusIsAdded()) {
+                    processMinusContentPoint(point, reviewEvent);
+                }
+            }
+
+            for (PointLog photoLog : pointTransactionLogs.getLogsByPhoto()) {
+                if (pointTransactionLogs.pointTxStatusIsAdded()) {
+                    processMinusPhotoPoint(point, reviewEvent);
+                }
+            }
+
+        }
 
         if (reviewEvent.isActionMod()) {
-            List<PointLog> pointLogs = pointLogRep.findByPlaceId(reviewEvent.getPlaceId()); // 검색 인덱스 지정
-            PointLogs pointTransactionLogs = new PointLogs(pointLogs);
-
             checkContentProcess(pointTransactionLogs.getLogsByContent(), point, reviewEvent);
             checkPhotoProcess(pointTransactionLogs.getLogsByPhoto(), point, reviewEvent);
         }

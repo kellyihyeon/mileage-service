@@ -41,7 +41,7 @@ public class ReviewEvent {
         return ReviewEventAction.MOD.equals(action);
     }
 
-    public boolean isActionDelete() {
+    public boolean actionIsDelete() {
         return ReviewEventAction.DELETE.equals(action);
     }
 }

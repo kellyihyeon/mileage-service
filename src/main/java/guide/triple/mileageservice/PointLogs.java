@@ -32,4 +32,21 @@ public class PointLogs {
     public List<PointLog> getLogsByPhoto() {
         return pointLogs.stream().filter(pointLog -> PointDetails.PHOTO.equals(pointLog.getDetails())).collect(Collectors.toList());
     }
+
+    public PointStatus getPointTxStatus() {
+        PointStatus status = null;
+
+        for (PointLog pointLog : pointLogs) {
+            if (PointStatus.ADDED.equals(pointLog.getStatus())) {
+                status = PointStatus.ADDED;
+            } else if (PointStatus.CANCELED.equals(pointLog.getStatus())) {
+                status = PointStatus.CANCELED;
+            }
+        }
+        return status;
+    }
+
+    public boolean pointTxStatusIsAdded() {
+        return PointStatus.ADDED.equals(getPointTxStatus());
+    }
 }
