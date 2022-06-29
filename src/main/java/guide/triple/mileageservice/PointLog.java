@@ -3,7 +3,6 @@ package guide.triple.mileageservice;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import javax.persistence.*;
 
 @Getter
@@ -29,16 +28,17 @@ public class PointLog {
 
     private String placeId;
 
-    @ColumnDefault(value = "false")
-    private boolean pointCheck;
 
     @Builder
-    public PointLog(Point point, Integer amount, PointStatus status, PointDetails details, String placeId, boolean pointCheck) {
+    public PointLog(Point point, Integer amount, PointStatus status, PointDetails details, String placeId) {
         this.point = point;
         this.amount = amount;
         this.status = status;
         this.details = details;
         this.placeId = placeId;
-        this.pointCheck = pointCheck;
+    }
+
+    public boolean statusIsAdded() {
+        return PointStatus.ADDED.equals(this.status);
     }
 }
