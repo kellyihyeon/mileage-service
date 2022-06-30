@@ -10,7 +10,7 @@ public interface PointLogRepository extends JpaRepository<PointLog, Long> {
 
     Boolean existsByPlaceId(String placeId);
 
-    List<PointLog> findByPointId(Long pointId);
-
     List<PointLog> findByPoint(Point point);
+
+    List<PointLog> findByPlaceId(String placeId);
 }

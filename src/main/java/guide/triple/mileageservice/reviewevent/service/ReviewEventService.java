@@ -51,12 +51,15 @@ public class ReviewEventService {
         }
 
         if (reviewEvent.isActionAdd()) {
-            if (!pointLogRep.existsByPlaceId(reviewEvent.getPlaceId())) {
+            if (!pointTransactionLogs.pointTxStatusIsAdded(PointDetails.FIRST_REVIEW)) {
                 processPlusFirstReviewPoint(point, reviewEvent);
             }
 
-            if (!pointTransactionLogs.pointTxStatusIsAdded()) {
+            if (!pointTransactionLogs.pointTxStatusIsAdded(PointDetails.CONTENT)) {
                 processPlusContentPoint(point, reviewEvent);
+            }
+
+            if (!pointTransactionLogs.pointTxStatusIsAdded(PointDetails.PHOTO)) {
                 processPlusPhotoPoint(point, reviewEvent);
             }
         }

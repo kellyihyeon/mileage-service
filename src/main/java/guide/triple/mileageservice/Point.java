@@ -48,7 +48,7 @@ public class Point {
                 .status(status)
                 .details(details)
                 .placeId(placeId)
-                .now(LocalDateTime.now())
+                .time(LocalDateTime.now())
                 .build();
     }
 

@@ -47,8 +47,24 @@ public class PointLogs {
         return status;
     }
 
-    public boolean pointTxStatusIsAdded() {
+    public PointStatus getPointTxStatus(PointDetails details) { //FIRST_REVIEW, CONTENT, PHOTO
+        PointStatus status = PointStatus.NOTHING_DEFAULT;
+
+        for (PointLog pointLog : pointLogs) {
+            if (details.equals(pointLog.getDetails())) {
+                status = pointLog.getStatus();
+            }
+        }
+        return status;
+    }
+
+    public boolean pointTxStatusIsAdded() { //
         return PointStatus.ADDED.equals(getPointTxStatus());
+    }
+
+    public boolean pointTxStatusIsAdded(PointDetails details) {
+        return PointStatus.ADDED.equals(getPointTxStatus(details));
+
     }
 
     public List<PointLog> getLogsByFirstReview() {
@@ -57,5 +73,9 @@ public class PointLogs {
 
     public Long getTotalPoint() {
         return pointLogs.stream().map(pointLog -> Math.max(Integer.MIN_VALUE, pointLog.getId())).findFirst().orElse(null);
+    }
+
+    public boolean hasLogByFirstReview() {
+        return pointLogs.stream().anyMatch(pointLog -> PointDetails.FIRST_REVIEW.equals(pointLog.getDetails()));
     }
 }

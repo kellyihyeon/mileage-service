@@ -1,6 +1,6 @@
 package guide.triple.mileageservice;
 
 public enum PointStatus {
-    ADDED, CANCELED
+    ADDED, NOTHING_DEFAULT, CANCELED
 
 }
