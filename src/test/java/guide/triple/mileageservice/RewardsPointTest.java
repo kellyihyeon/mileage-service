@@ -1,5 +1,9 @@
 package guide.triple.mileageservice;
 
+import guide.triple.mileageservice.entity.Point;
+import guide.triple.mileageservice.entity.PointDetails;
+import guide.triple.mileageservice.entity.PointStatus;
+import guide.triple.mileageservice.dto.ReviewEventReqDto;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -30,7 +34,7 @@ public class RewardsPointTest {
         point.check(dto);
         List<RewardsPoint> pointHistories = point.getPointHistory();
 
-        assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.REVIEW), pointHistories.get(CONTENT));
+        assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.CONTENT), pointHistories.get(CONTENT));
         assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.PHOTO), pointHistories.get(PHOTO));
     }
 
@@ -43,7 +47,7 @@ public class RewardsPointTest {
 
         final int HISTORY_SIZE = 0;
         if (index == 0) {
-            assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.REVIEW), pointHistories.get(HISTORY_SIZE));
+            assertEquals(new RewardsPoint(1, PointStatus.ADDED, PointDetails.CONTENT), pointHistories.get(HISTORY_SIZE));
         }
 
         if (index == 1) {

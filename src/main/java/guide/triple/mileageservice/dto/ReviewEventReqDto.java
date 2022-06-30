@@ -1,8 +1,9 @@
-package guide.triple.mileageservice;
+package guide.triple.mileageservice.dto;
 
+import guide.triple.mileageservice.entity.ReviewEvent;
+import guide.triple.mileageservice.entity.ReviewEventAction;
 import lombok.Getter;
 import lombok.ToString;
-
 import java.util.List;
 
 @ToString
@@ -32,6 +33,17 @@ public class ReviewEventReqDto {
         this.attachedPhotoIds = attachedPhotoIds;
         this.userId = userId;
         this.placeId = placeId;
+    }
 
+    public ReviewEvent toEntity() {
+        return ReviewEvent.builder()
+                            .type(type)
+                            .action(action)
+                            .reviewId(reviewId)
+                            .content(content)
+                            .attachedPhotoIds(attachedPhotoIds)
+                            .userId(userId)
+                            .placeId(placeId)
+                            .build();
     }
 }

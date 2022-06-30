@@ -1,5 +1,9 @@
 package guide.triple.mileageservice;
 
+import guide.triple.mileageservice.entity.Point;
+import guide.triple.mileageservice.entity.PointDetails;
+import guide.triple.mileageservice.dto.ReviewEventReqDto;
+import guide.triple.mileageservice.entity.ReviewEventAction;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -65,7 +69,7 @@ public class PointTest {
         List<RewardsPoint> rewardsPoint = point.getPointHistory();  // PHOTO
 
         Boolean existedContentPoint = rewardsPoint.stream()
-                .map(history -> PointDetails.REVIEW.equals(history.getDetails()))
+                .map(history -> PointDetails.CONTENT.equals(history.getDetails()))
                 .findFirst()
                 .orElse(false);
 
