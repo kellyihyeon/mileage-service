@@ -42,7 +42,4 @@ public class PointLog {
         this.time = time;
     }
 
-    public boolean statusIsAdded() {
-        return PointStatus.ADDED.equals(this.status);
-    }
 }

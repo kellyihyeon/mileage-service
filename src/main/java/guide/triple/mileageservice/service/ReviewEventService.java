@@ -23,16 +23,17 @@ public class ReviewEventService {
 
 
     @Transactional
-    public void createEvent(ReviewEvent reviewEvent) {
+    public Boolean createEvent(ReviewEvent reviewEvent) {
         Point point = pointRep.findByUserId(reviewEvent.getUserId());
         List<PointLog> pointLogs = pointLogRep.findByPlaceIdAndPointId(reviewEvent.getPlaceId(), point.getId());
         PointLogs pointTransactionLogs = new PointLogs(pointLogs);
 
-        if (reviewEvent.actionIsDelete()) {
-            checkFirstReviewByPlaceAndUser(pointTransactionLogs, point, reviewEvent);
-            checkAddedPointTxByContent(pointTransactionLogs, point, reviewEvent);
-            checkAddedPointTxByPhoto(pointTransactionLogs, point, reviewEvent);
+        if (reviewEvent.isActionAdd()) {
+            checkDuplicatedReviewAction(pointTransactionLogs);
+            checkFirstReviewByPlace(point, reviewEvent);
 
+            processPlusContentPoint(point, reviewEvent);
+            processPlusPhotoPoint(point, reviewEvent);
         }
 
         if (reviewEvent.isActionMod()) {
@@ -49,15 +50,13 @@ public class ReviewEventService {
             }
         }
 
-
-        if (reviewEvent.isActionAdd()) {
-            checkDuplicatedReviewAction(pointTransactionLogs);
-            checkFirstReviewByPlace(point, reviewEvent);
-
-            processPlusContentPoint(point, reviewEvent);
-            processPlusPhotoPoint(point, reviewEvent);
+        if (reviewEvent.actionIsDelete()) {
+            checkFirstReviewByPlaceAndUser(pointTransactionLogs, point, reviewEvent);
+            checkAddedPointTxByContent(pointTransactionLogs, point, reviewEvent);
+            checkAddedPointTxByPhoto(pointTransactionLogs, point, reviewEvent);
         }
 
+        return true;
     }
 
     private void checkFirstReviewByPlaceAndUser(PointLogs pointTransactionLogs, Point point, ReviewEvent reviewEvent) {

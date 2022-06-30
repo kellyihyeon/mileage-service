@@ -21,10 +21,9 @@ public class ReviewEventController {
 
 
     @PostMapping
-    public String createEvent(@RequestBody ReviewEventReqDto dto) {
+    public ApiResponse<Boolean> createEvent(@RequestBody ReviewEventReqDto dto) {
         log.info("리뷰 포인트 이벤트 발생 - {}", dto);
-        reviewEventService.createEvent(dto.toEntity());
-        return "200, OK";
+        return ApiResponse.ok(reviewEventService.createEvent(dto.toEntity()));
     }
 
     @GetMapping()
