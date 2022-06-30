@@ -28,34 +28,46 @@ public class ReviewEventService {
         PointLogs pointTransactionLogs = new PointLogs(pointLogs);
 
         if (reviewEvent.isActionAdd()) {
-            checkDuplicatedReviewAction(pointTransactionLogs);
-            checkFirstReviewByPlace(point, reviewEvent);
-
-            processPlusContentPoint(point, reviewEvent);
-            processPlusPhotoPoint(point, reviewEvent);
+            processActionAdd(reviewEvent, point, pointTransactionLogs);
         }
 
         if (reviewEvent.isActionMod()) {
-            if (pointTransactionLogs.pointTxStatusIsAdded(PointDetails.CONTENT)) {
-                processMinusContentPoint(point, reviewEvent);
-            } else {
-                processPlusContentPoint(point, reviewEvent);
-            }
-
-            if (pointTransactionLogs.pointTxStatusIsAdded(PointDetails.PHOTO)) {
-                processMinusPhotoPoint(point, reviewEvent);
-            } else {
-                processPlusPhotoPoint(point, reviewEvent);
-            }
+            processActionMod(reviewEvent, point, pointTransactionLogs);
         }
 
         if (reviewEvent.isActionDelete()) {
-            checkFirstReviewByPlaceAndUser(pointTransactionLogs, point, reviewEvent);
-            checkAddedPointTxByContent(pointTransactionLogs, point, reviewEvent);
-            checkAddedPointTxByPhoto(pointTransactionLogs, point, reviewEvent);
+            processActionDelete(reviewEvent, point, pointTransactionLogs);
         }
 
         return true;
+    }
+
+    private void processActionDelete(ReviewEvent reviewEvent, Point point, PointLogs pointTransactionLogs) {
+        checkFirstReviewByPlaceAndUser(pointTransactionLogs, point, reviewEvent);
+        checkAddedPointTxByContent(pointTransactionLogs, point, reviewEvent);
+        checkAddedPointTxByPhoto(pointTransactionLogs, point, reviewEvent);
+    }
+
+    private void processActionMod(ReviewEvent reviewEvent, Point point, PointLogs pointTransactionLogs) {
+        if (pointTransactionLogs.pointTxStatusIsAdded(PointDetails.CONTENT)) {
+            processMinusContentPoint(point, reviewEvent);
+        } else {
+            processPlusContentPoint(point, reviewEvent);
+        }
+
+        if (pointTransactionLogs.pointTxStatusIsAdded(PointDetails.PHOTO)) {
+            processMinusPhotoPoint(point, reviewEvent);
+        } else {
+            processPlusPhotoPoint(point, reviewEvent);
+        }
+    }
+
+    private void processActionAdd(ReviewEvent reviewEvent, Point point, PointLogs pointTransactionLogs) {
+        checkDuplicatedReviewAction(pointTransactionLogs);
+        checkFirstReviewByPlace(point, reviewEvent);
+
+        processPlusContentPoint(point, reviewEvent);
+        processPlusPhotoPoint(point, reviewEvent);
     }
 
     private void checkFirstReviewByPlaceAndUser(PointLogs pointTransactionLogs, Point point, ReviewEvent reviewEvent) {
