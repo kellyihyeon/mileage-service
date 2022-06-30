@@ -8,8 +8,9 @@ public interface PointLogRepository extends JpaRepository<PointLog, Long> {
 
     List<PointLog> findByPlaceIdAndPointId(String placeId, Long pointId);
 
-    List<PointLog> findByPlaceId(String placeId);
-
     Boolean existsByPlaceId(String placeId);
 
+    List<PointLog> findByPointId(Long pointId);
+
+    List<PointLog> findByPoint(Point point);
 }

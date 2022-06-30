@@ -1,5 +1,8 @@
 package guide.triple.mileageservice.reviewevent.controller;
 
+import guide.triple.mileageservice.ApiResponse;
+import guide.triple.mileageservice.reviewevent.service.HistoryDto;
+import guide.triple.mileageservice.reviewevent.service.MyPointHistory;
 import guide.triple.mileageservice.reviewevent.service.ReviewEventService;
 import guide.triple.mileageservice.reviewevent.dto.ReviewEventReqDto;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,11 @@ public class ReviewEventController {
         log.info("리뷰 포인트 이벤트 발생 - {}", dto);
         service.pointEvent(dto.toEntity());
         return "200, OK";
+    }
+
+    @GetMapping()
+    public ApiResponse<MyPointHistory<HistoryDto>> getMyPoint() {
+        return ApiResponse.ok(service.getMyPoint());
     }
 
 

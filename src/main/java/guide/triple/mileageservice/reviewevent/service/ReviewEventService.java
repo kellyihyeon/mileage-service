@@ -5,6 +5,8 @@ import guide.triple.mileageservice.reviewevent.entity.ReviewEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -16,6 +18,7 @@ public class ReviewEventService {
     private final PointLogRepository pointLogRep;
 
 
+    @Transactional
     public void pointEvent(ReviewEvent reviewEvent) {
         Point point = pointRep.findByUserId(reviewEvent.getUserId());
         List<PointLog> pointLogs = pointLogRep.findByPlaceIdAndPointId(reviewEvent.getPlaceId(), point.getId());
@@ -115,5 +118,26 @@ public class ReviewEventService {
         }
     }
 
+
+    public MyPointHistory<HistoryDto> getMyPoint() {
+        String concurrentUserId = "8crf2ew6-25r3-3492-y2w0-2f582458z024";
+
+        Point point = pointRep.findByUserId(concurrentUserId);
+        List<PointLog> logs = pointLogRep.findByPoint(point);
+        PointLogs pointLogs = new PointLogs(logs);
+
+        List<HistoryDto> historyDtos = new ArrayList<>();
+        logs.forEach(pointLog ->
+                historyDtos.add(
+                        new HistoryDto(pointLog.getId(),
+                                pointLog.getAmount(),
+                                pointLog.getStatus(),
+                                pointLog.getDetails(),
+                                pointLog.getPlaceId(),
+                                pointLog.getTime())));
+
+        historyDtos.sort(new PointLogIdComparator().reversed());
+        return new MyPointHistory<>(historyDtos, point.getTotalPoint());
+    }
 }
 

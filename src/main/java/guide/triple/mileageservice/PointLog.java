@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
@@ -28,14 +29,17 @@ public class PointLog {
 
     private String placeId;
 
+    private LocalDateTime time;
+
 
     @Builder
-    public PointLog(Point point, Integer amount, PointStatus status, PointDetails details, String placeId) {
+    public PointLog(Point point, Integer amount, PointStatus status, PointDetails details, String placeId, LocalDateTime time) {
         this.point = point;
         this.amount = amount;
         this.status = status;
         this.details = details;
         this.placeId = placeId;
+        this.time = time;
     }
 
     public boolean statusIsAdded() {

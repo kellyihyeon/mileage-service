@@ -54,4 +54,8 @@ public class PointLogs {
     public List<PointLog> getLogsByFirstReview() {
         return pointLogs.stream().filter(pointLog -> PointDetails.FIRST_REVIEW.equals(pointLog.getDetails())).collect(Collectors.toList());
     }
+
+    public Long getTotalPoint() {
+        return pointLogs.stream().map(pointLog -> Math.max(Integer.MIN_VALUE, pointLog.getId())).findFirst().orElse(null);
+    }
 }

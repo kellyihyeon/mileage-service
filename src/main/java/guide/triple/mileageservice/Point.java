@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.ColumnDefault;
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -47,6 +48,7 @@ public class Point {
                 .status(status)
                 .details(details)
                 .placeId(placeId)
+                .now(LocalDateTime.now())
                 .build();
     }
 
