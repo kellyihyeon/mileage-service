@@ -46,8 +46,17 @@ public class ReviewEventService {
         }
 
         if (reviewEvent.isActionMod()) {
-            checkContentProcess(pointTransactionLogs.getLogsByContent(), point, reviewEvent);
-            checkPhotoProcess(pointTransactionLogs.getLogsByPhoto(), point, reviewEvent);
+            if (pointTransactionLogs.pointTxStatusIsAdded(PointDetails.CONTENT)) {
+                processMinusContentPoint(point, reviewEvent);
+            }else {
+                processPlusContentPoint(point, reviewEvent);
+            }
+
+            if (pointTransactionLogs.pointTxStatusIsAdded(PointDetails.PHOTO)) {
+                processMinusPhotoPoint(point, reviewEvent);
+            }else {
+                processPlusPhotoPoint(point, reviewEvent);
+            }
         }
 
         if (reviewEvent.isActionAdd()) {
@@ -75,25 +84,6 @@ public class ReviewEventService {
 
     }
 
-    private void checkContentProcess(List<PointLog> contentLogs, Point point, ReviewEvent reviewEvent) {
-        for (PointLog contentLog : contentLogs) {
-            if (contentLog.statusIsAdded()) {
-                processMinusContentPoint(point, reviewEvent);
-            } else {
-                processPlusContentPoint(point, reviewEvent);
-            }
-        }
-    }
-
-    private void checkPhotoProcess(List<PointLog> photoLogs, Point point, ReviewEvent reviewEvent) {
-        for (PointLog photoLog : photoLogs) {
-            if (photoLog.statusIsAdded()) {
-                processMinusPhotoPoint(point, reviewEvent);
-            } else {
-                processPlusPhotoPoint(point, reviewEvent);
-            }
-        }
-    }
 
     private void processMinusPhotoPoint(Point point, ReviewEvent reviewEvent) {
         if (!reviewEvent.hasAttachedPhoto()) {
