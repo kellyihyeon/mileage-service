@@ -1,4 +1,4 @@
-package guide.triple.mileageservice;
+package guide.triple.mileageservice.common;
 
 
 import lombok.Getter;

@@ -1,5 +1,8 @@
 package guide.triple.mileageservice;
 
+import guide.triple.mileageservice.entity.PointDetails;
+import guide.triple.mileageservice.entity.PointStatus;
+
 import java.util.Objects;
 
 public class RewardsPoint {

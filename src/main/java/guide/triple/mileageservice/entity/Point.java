@@ -1,6 +1,5 @@
-package guide.triple.mileageservice;
+package guide.triple.mileageservice.entity;
 
-import guide.triple.mileageservice.reviewevent.entity.ReviewEvent;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.ColumnDefault;
@@ -26,21 +25,6 @@ public class Point {
     private int totalPoint;
 
 
-
-    public PointLog plusPointByPhoto(ReviewEvent event) {
-        plusPoint();
-        return createPointLog(PointDetails.PHOTO, event.getPlaceId(), PointStatus.ADDED);
-    }
-
-    public PointLog plusPointByContent(ReviewEvent event) {
-        plusPoint();
-        return createPointLog(PointDetails.CONTENT, event.getPlaceId(), PointStatus.ADDED);
-    }
-
-    private void plusPoint() {
-        totalPoint += 1;
-    }
-
     private PointLog createPointLog(PointDetails details, String placeId, PointStatus status) {
         return PointLog.builder()
                 .point(this)
@@ -52,19 +36,6 @@ public class Point {
                 .build();
     }
 
-    public PointLog minusPointByContent(ReviewEvent event) {
-        minusPoint();
-        return createPointLog(PointDetails.CONTENT, event.getPlaceId(), PointStatus.CANCELED);
-    }
-
-    public PointLog minusPointByPhoto(ReviewEvent event) {
-        minusPoint();
-        return createPointLog(PointDetails.PHOTO, event.getPlaceId(), PointStatus.CANCELED);
-    }
-
-    private void minusPoint() {
-        totalPoint -= 1;
-    }
 
     public PointLog plusPointByFirstReview(ReviewEvent event) {
         plusPoint();
@@ -74,6 +45,34 @@ public class Point {
     public PointLog minusPointByFirstReview(ReviewEvent event) {
         minusPoint();
         return createPointLog(PointDetails.FIRST_REVIEW, event.getPlaceId(), PointStatus.CANCELED);
+    }
+
+    public PointLog plusPointByContent(ReviewEvent event) {
+        plusPoint();
+        return createPointLog(PointDetails.CONTENT, event.getPlaceId(), PointStatus.ADDED);
+    }
+
+    public PointLog minusPointByContent(ReviewEvent event) {
+        minusPoint();
+        return createPointLog(PointDetails.CONTENT, event.getPlaceId(), PointStatus.CANCELED);
+    }
+
+    public PointLog plusPointByPhoto(ReviewEvent event) {
+        plusPoint();
+        return createPointLog(PointDetails.PHOTO, event.getPlaceId(), PointStatus.ADDED);
+    }
+
+    public PointLog minusPointByPhoto(ReviewEvent event) {
+        minusPoint();
+        return createPointLog(PointDetails.PHOTO, event.getPlaceId(), PointStatus.CANCELED);
+    }
+
+    private void plusPoint() {
+        totalPoint += 1;
+    }
+
+    private void minusPoint() {
+        totalPoint -= 1;
     }
 }
 

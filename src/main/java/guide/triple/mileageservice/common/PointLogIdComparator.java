@@ -1,5 +1,6 @@
-package guide.triple.mileageservice.reviewevent.service;
+package guide.triple.mileageservice.common;
 
+import guide.triple.mileageservice.dto.HistoryDto;
 import java.util.Comparator;
 
 public class PointLogIdComparator implements Comparator<HistoryDto> {

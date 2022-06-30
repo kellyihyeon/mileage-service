@@ -1,7 +1,7 @@
-package guide.triple.mileageservice.reviewevent.dto;
+package guide.triple.mileageservice.dto;
 
-import guide.triple.mileageservice.reviewevent.entity.ReviewEvent;
-import guide.triple.mileageservice.reviewevent.entity.ReviewEventAction;
+import guide.triple.mileageservice.entity.ReviewEvent;
+import guide.triple.mileageservice.entity.ReviewEventAction;
 import lombok.Getter;
 import lombok.ToString;
 import java.util.List;

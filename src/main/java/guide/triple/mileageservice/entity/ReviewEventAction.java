@@ -1,4 +1,4 @@
-package guide.triple.mileageservice.reviewevent.entity;
+package guide.triple.mileageservice.entity;
 
 public enum ReviewEventAction {
     ADD, MOD, DELETE

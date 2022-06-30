@@ -1,4 +1,4 @@
-package guide.triple.mileageservice.reviewevent.service;
+package guide.triple.mileageservice.dto;
 
 import lombok.Getter;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.List;
 @Getter
 public class MyPointHistory<T> {
 
-    private final List<T> histories;
     private final int totalPoint;
+    private final List<T> histories;
 
     public MyPointHistory(List<T> logs, int totalPoint) {
         this.histories = logs;

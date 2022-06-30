@@ -1,8 +1,8 @@
-package guide.triple.mileageservice.reviewevent.service;
+package guide.triple.mileageservice.dto;
 
-import guide.triple.mileageservice.PointDetails;
-import guide.triple.mileageservice.PointLog;
-import guide.triple.mileageservice.PointStatus;
+import guide.triple.mileageservice.entity.PointDetails;
+import guide.triple.mileageservice.entity.PointLog;
+import guide.triple.mileageservice.entity.PointStatus;
 import lombok.Getter;
 import java.time.LocalDateTime;
 
