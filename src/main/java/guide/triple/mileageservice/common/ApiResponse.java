@@ -21,4 +21,8 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> ok(T result) {
         return new ApiResponse<>(200, result, LocalDateTime.now());
     }
+
+    public static <T> ApiResponse<T> conflict(T result) {
+        return new ApiResponse<>(409, result, LocalDateTime.now());
+    }
 }
