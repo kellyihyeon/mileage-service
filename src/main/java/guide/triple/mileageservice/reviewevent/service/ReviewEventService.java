@@ -25,31 +25,25 @@ public class ReviewEventService {
         PointLogs pointTransactionLogs = new PointLogs(pointLogs);
 
         if (reviewEvent.actionIsDelete()) {
-            for (PointLog contentLog : pointTransactionLogs.getLogsByContent()) {
-                if (pointTransactionLogs.pointTxStatusIsAdded()) {
-                    processMinusContentPoint(point, reviewEvent);
-                }
+            if (pointTransactionLogs.pointTxStatusIsAdded(PointDetails.FIRST_REVIEW)) {
+                processMinusFirstReviewPoint(point, reviewEvent);
             }
 
-            for (PointLog photoLog : pointTransactionLogs.getLogsByPhoto()) {
-                if (pointTransactionLogs.pointTxStatusIsAdded()) {
-                    processMinusPhotoPoint(point, reviewEvent);
-                }
+            if (pointTransactionLogs.pointTxStatusIsAdded(PointDetails.CONTENT)) {
+                processMinusContentPoint(point, reviewEvent);
             }
 
-            for (PointLog firstReviewLog : pointTransactionLogs.getLogsByFirstReview()) {
-                if (pointTransactionLogs.pointTxStatusIsAdded()) {
-                    processMinusFirstReviewPoint(point, reviewEvent);
-                }
+            if (pointTransactionLogs.pointTxStatusIsAdded(PointDetails.PHOTO)) {
+                processMinusPhotoPoint(point, reviewEvent);
             }
 
         }
 
         if (reviewEvent.isActionMod()) {
             if (pointTransactionLogs.pointTxStatusIsAdded(PointDetails.CONTENT)) {
-                processMinusContentPoint(point, reviewEvent);
+                processMinusContentPoint(point, reviewEvent);// 컨텐트 트랜잭션이 added 일 때 컨텐트 마이너스
             }else {
-                processPlusContentPoint(point, reviewEvent);
+                processPlusContentPoint(point, reviewEvent);// 컨텐트 트랜잭션이 canceled 일 때 컨텐트 플러스
             }
 
             if (pointTransactionLogs.pointTxStatusIsAdded(PointDetails.PHOTO)) {
@@ -66,7 +60,7 @@ public class ReviewEventService {
 
             if (!pointTransactionLogs.pointTxStatusIsAdded(PointDetails.CONTENT)) {
                 processPlusContentPoint(point, reviewEvent);
-            }
+            }   // 컨텐트 트랜잭션이 canceled 일 때 컨텐트 플러스
 
             if (!pointTransactionLogs.pointTxStatusIsAdded(PointDetails.PHOTO)) {
                 processPlusPhotoPoint(point, reviewEvent);
