@@ -1,200 +1,234 @@
 # 트리플여행자 클럽 마일리지 서비스
 
-## [ 애플리케이션 실행 방법 ]
-- 애플리케이션 실행 방법을 제시한다.
+## **서비스 소개**
+- 사용자가 여행 장소에 대한 리뷰를 작성하면 포인트를 적립해준다.
+- 전체/개인에 대한 포인트 적립 히스토리를 확인할 수 있다.
+- 개인별 누적 포인트를 관리할 수 있다.
 
 <br>
 
-## [ 기능 목록 ]
-#### *리뷰 이벤트가 발생하면 포인트를 부여하거나 회수한다.*
+## **기능 분석**
+- 한 사용자는 장소마다 리뷰를 1개만 작성할 수 있다.
 
-- 리뷰가 작성될 때마다 리뷰 작성 이벤트가 발생하고, 아래 API로 이벤트를 전달한다. (Input)
-    ``` java
-    POST /events
+- 리뷰는 수정 또는 삭제할 수 있다.
+
+- 리뷰 작성 보상 점수 규정대로 포인트를 계산한다.
+  ```text
+  - 내용 점수
+    1자 이상 텍스트 작성: 1점
+    1장 이상 사진 첨부: 1점
+
+  - 보너스 점수
+    특정 장소에 첫 리뷰 작성: 1점
+
+  ```
+
+- 포인트 증감이 있을 때마다 이력이 남아야한다.
+
+- 사용자마다 현 시점의 포인트 총점을 조회하거나 계산할 수 있어야 한다.
+
+- 포인트 적립 API 구현에 필요한 SQL 수행 시, 전체 테이블 스캔이 일어나지 않는 인덱스가 필요하다.
+
+- 리뷰를 작성했다가 삭제하면 해당 리뷰로 적립한 리뷰 내용 포인트와 보너스 포인트는 회수한다.
+
+- 리뷰를 수정하면 수정한 내용에 맞는 리뷰 내용 포인트를 계산하여 적립하거나 회수한다.
+  ```text
+    - 글만 작성한 리뷰에 사진 추가: 1포인트 적립
+    - 글과 사진이 있는 리뷰에서 사진 모두 삭제: 1포인트 회수
+  ```
+
+- 사용자 입장에서 본 ‘첫 리뷰’일 때 보너스 포인트를 적립한다.
+  ```java
+    - 어떤 장소에 사용자 A가 리뷰를 남겼다가 삭제하고, 삭제된 이후 사용자 B가 리뷰를 남기면 사용자 B에게 보너스 포인트 적립
+
+    - 어떤 장소에 사용자 A가 리뷰를 남겼다가 삭제하는데, 삭제되기 이전에 사용자 B가 리뷰를 남기면 사용자 B에게 보너스 포인트 적립 X
+
+  ```
+
+<br> 
+  
+## **DB 스키마 설계**
+```java
+포인트 (포인트ID(PK), 유저ID, 총 포인트)
+포인트로그 (포인트로그ID(PK), 포인트ID(FK), 포인트점수(FK), 포인트상태, 포인트설명, 장소ID, 시간)
+```
+```java
+CREATE TABLE Point(
+	id BIGINT,
+	userid VARCHAR(255),
+	total_point INTEGER,
+	CONSTRAINT point_id PRIMARY KEY(id)
+);
+
+CREATE TABLE Point_Log(
+  id BIGINT,
+  amount INTEGER,
+  details VARCHAR(255),
+  place_id VARCHAR(255),
+  status VARCHAR(255),
+  time TIMESTAMP,
+  point_id BIGINT,
+  PRIMARY KEY(id),
+  FOREIGN KEY(point_id) REFERENCES Point(id)
+);
+```
+```text
+INSERT INTO POINT(USER_ID) VALUES ('3ede0ef2-92b7-4817-a5f3-0c575361f745');
+INSERT INTO POINT(USER_ID) VALUES ('5crf8ew7-46r3-8243-y3w9-3f376543s932');
+INSERT INTO POINT(USER_ID) VALUES ('8crf2ew6-25r3-3492-y2w0-2f582458z024');
+```
+- data.sql 파일에 유저 3명의 아이디를 INSERT 해놓았다.
+
+<br>
+
+## **애플리케이션 실행 방법**
+- 현재 접속한 유저의 아이디는 "8crf2ew6-25r3-3492-y2w0-2f582458z024"로 설정을 해놓았다.
+
+- MileageServiceApplication 파일을 실행한다.
+- postman으로 api 요청을 한다.
+
+- 포인트 적립 API - POST /events 
+  - ADD 이벤트 요청하기
+    ```json
     {
         "type": "REVIEW",
-        "action": "ADD", /* "MOD", "DELETE" */
+        "action": "ADD",
         "reviewId": "240a0658-dc5f-4878-9381-ebb7b2667772",
-        "content": "좋아요!",
-        "attachedPhotoIds": ["e4d1a64e-a531-46de-88d0-ff0ed70c0bb8", "afb0cef2-851d-4a50-bb07-9cc15cbdc332"],
-        "userId": "3ede0ef2-92b7-4817-a5f3-0c575361f745",
+        "content": "파리에 다녀오니 너무 좋았다.",
+        "attachedPhotoIds": ["e4d1a64e-a531-46de-88d0-ff0ed70c0bb8","afb0cef2-851d-4a50-bb07-9cc15cbdc332"],
+        "userId": "8crf2ew6-25r3-3492-y2w0-2f582458z024",
         "placeId": "2e4baf1c-5acb-4efb-a1af-eddada31b00f"
     }
     ```
-<br>
-
-- 리뷰 이벤트가 발생했을 때 보상 점수 계산하기
+  - MOD 이벤트 요청하기 (리뷰 내용 삭제)
+    ```json
+    {
+        "type": "REVIEW",
+        "action": "MOD",
+        "reviewId": "240a0658-dc5f-4878-9381-ebb7b2667772",
+        "content": "",
+        "attachedPhotoIds": ["e4d1a64e-a531-46de-88d0-ff0ed70c0bb8", "afb0cef2-851d-4a50-bb07-9cc15cbdc332"],
+        "userId": "8crf2ew6-25r3-3492-y2w0-2f582458z024",
+        "placeId": "2e4baf1c-5acb-4efb-a1af-eddada31b00f"
+    }
     ```
-    [ 리뷰 작성 보상 점수 ]
-    
-    내용 점수
-      - 1자 이상 텍스트 작성: 1점
-      - 1장 이상 사진 첨부: 1점
-    
-    보너스 점수
-      - 특정 장소에 첫 리뷰 작성: 1점
+  - MOD 이벤트 요청하기 (리뷰 사진 삭제)
+    ```json
+    {
+        "type": "REVIEW",
+        "action": "MOD",
+        "reviewId": "240a0658-dc5f-4878-9381-ebb7b2667772",
+        "content": "파리에 다녀오니 너무 좋았다.",
+        "attachedPhotoIds": [],
+        "userId": "8crf2ew6-25r3-3492-y2w0-2f582458z024",
+        "placeId": "2e4baf1c-5acb-4efb-a1af-eddada31b00f"
+    }
     ```
-    - 이벤트의 type 이 REVIEW 이다.
-    - 포인트를 적립할 수 있는 다양한 방법 중 리뷰 이벤트를 구현하는 것이 MVP.
-    
+  - DELETE 이벤트 요청하기 (리뷰 삭제)
+    ```json
+    {
+        "type": "REVIEW",
+        "action": "DELETE",
+        "reviewId": "240a0658-dc5f-4878-9381-ebb7b2667772",
+        "content": "파리에 다녀오니 너무 좋았다.",
+        "attachedPhotoIds": ["e4d1a64e-a531-46de-88d0-ff0ed70c0bb8","afb0cef2-851d-4a50-bb07-9cc15cbdc332"],
+        "userId": "8crf2ew6-25r3-3492-y2w0-2f582458z024",
+        "placeId": "2e4baf1c-5acb-4efb-a1af-eddada31b00f"
+    }
+    ```
+
+- 내포인트 조회 API: GET /events
+  - 총 포인트 점수 및 포인트 내역 조회  
+  ![getMyPoint](https://user-images.githubusercontent.com/73330352/176680801-c855a7be-c3fa-473d-a62f-1e244a04847e.png)
+
 <br>
 
-- 한 사용자가 한 장소에 리뷰를 여러번 작성할 수 없도록 한다.
-    - 유저 id와 place id 의 관계 → place id를 기준으로 데이터를 뽑았을 때 user id가 이미 존재한다면 한 장소에 리뷰를 여러번 달려고 하는 것이므로 막는다.
-    - ❓재방문의 경우에는 어떻게 할 것인가?
+## **해결 전략**
+### **[ 보너스 포인트 처리 ]**
+- 첫 리뷰 조건
+    ```java
+    포인트 로그들
     
-<br>
+    로그1  포인트id3  1점  ADDED     FIRST_REVIEW   괌id  2022-06-20
+    로그2  포인트id3  1점  CANCELED  FIRST_REVIEW   괌id  2022-06-30
+    ```
+    - 해당 장소에대한 포인트로그가 하나도 없다면 첫 리뷰이다.
+    - 포인트로그가 있지만  FIRST_REVIEW - CANCELED 상태라면 첫 리뷰이다.
+    <br>
 
-- POST /events 포인트 부여 API
-    - action-ADD   
-      '리뷰 작성' 이벤트 발생 -> 리뷰 작성 보상 점수 계산 후 포인트 부여
-    - action-MOD   
-      '리뷰 수정' 이벤트 발생 -> 포인트 회수 및 유지
-    - action-DELETE   
-      '리뷰 삭제' 이벤트 발생 -> 포인트 회수
-    - SQL 수행 시, full table scan 이 일어나지 않는 인덱스가 필요하다.
-    - 리뷰 작성 시점에 첫 리뷰이면 보너스 점수를 부여한다.
+- 첫 리뷰 보상
+    - 첫 리뷰 등록만 하면 +1
+    - 첫 리뷰이면서 컨텐트, 포토 조건을 충족하면 각 +1 (최대 3포인트 획득)
+
+- 첫 리뷰 작성 시 보너스 포인트를 받았다면, 리뷰 삭제 시 보너스 포인트도 회수한다.
+    ```java
+    포인트 로그들 
+    																				
+    로그1  포인트id3  1점  ADDED     FIRST_REVIEW   괌id  2022-06-20
+    로그2  포인트id3  1점  ADDED     PHOTO          괌id  2022-06-20
     
+    로그3  포인트id3  1점  CANCELED  FIRST_REVIEW   괌id  2022-06-30
+    로그4  포인트id3  1점  CANCELED  PHOTO          괌id  2022-06-30
+    ```
   <br>
-  
-- GET /events 포인트 조회 API
-    - 포인트 조회 시 포인트 증감 히스토리를 보여준다.
+
+- action_ADD 일 때
+    - 검사해야할 대상은 특정 장소가 가진 포인트 로그들이다.
+    - 예를들면 괌 장소에 리뷰를 쓴 모든 사람들의 로그들을 대상으로 검사한다.
+
+- action_DELETE 일 때
+    - 검사해야할 대상은 특정 장소에 && 특정 유저가 가진 로그들이다.
+    - 예를들면 괌 장소에 리뷰를 쓴 특정 유저의 로그들을 대상으로 검사한다.
 
 <br>
 
-## [ 문제 분석 및 해결 전략 ]
-### 1. Flow
-- 리뷰 CRUD API를 담당하는 개발자A님
-    ``` java
-    POST /reviews
+### **[ action 데이터에 따른 상이한 접근 ]**
+- **한 사용자는 장소마다 리뷰를 1개만 작성할 수 있다.**
     
-    public Result createReview(Dto dto){
-            ...
-            service.createReview(dto);
-    }
+    ```java
+    포인트 로그들 (Place괌)          
     
-    Get /reviews
-    
-    public Result getAllReviews(){
-            ...
-            service.getAllReviews();
-    }
-    
-    PUT /reviews/{reviewId}
-    
-    public Result updateReview(){
-            ...
-            service.updateReview();
-    }
-    
-    DELETE /reviews/{reviewId}
-    
-    public Result deleteReview(){
-            ...
-            service.deleteReview();
-    }
+    1  pointId3  1점  ADDED  CONTENT 괌id  ADD
+    2  pointId3  1점  ADDED  PHOTO   괌id  ADD
     ```
-    - 리뷰 dto - 별점, 내용, 사진
-    - 리뷰 조회 result의 data - 닉네임, 유저레벨, 총 리뷰 갯수, 별점, 내용, 사진, 작성일
+    
+    - action ADD 이벤트 발생
+        - CONTENT 혹은 PHOTO의 트랜잭션 마지막 상태가 ADDED라면 리뷰를 작성하지 못한다.
+        - CANCELED이라면 특정 장소 리뷰가 삭제됐으므로 리뷰 작성이 가능하다.
 
-<br>
+    - **재방문**의 경우에는 어떻게 할 것인가?
+        - *`PointLog`* 필드에 주문관련 id 추가
+        - *`PointLog`* 의 주문 id와 발생한 이벤트의 주문 id 비교
+        - 다르다면 action ADD 이벤트의 데이터 내용에 따라 포인트 보상
 
-- 포인트 API를 담당하는 나
+- **ADD 일 때 (리뷰 작성)**
+    - 중복 작성인지 검사
+    - 첫 리뷰인지 검사
+    - 컨텐트 조건을 충족하면 포인트+
+    - 포토 조건을 충족하면 포인트+
 
-    ``` java
-        POST /events
-        
-        public ApiResonse<ResponseDto> addToMileagePoints(ReviewEventReqDto dto){
-        
-        }
-        
-        GET /events
+- **MOD 일 때 (리뷰 수정)**
+    ```java
+    포인트 로그들 (Place괌)          
+    
+    1  pointId3  1점  ADDED     CONTENT  괌id  ADD
+    2  pointId3  1점  ADDED     PHOTO    괌id  ADD
+    3  pointId3  1점  CANCELED  PHOTO    괌id  MOD- 리뷰 수정(포토 삭제)
+    4  pointId3  1점  CANCELED  CONTENT  괌id  DELETE- 리뷰 삭제
     ```
-
-    - 포인트 적립 API는 어디에서 호출하는가?
-      → 리뷰 작성을 마치면 포인트를 적립한다.  
-      프론트에서 `POST /reviews` API를 호출하면서 유저의 리뷰 데이터(별점, 내용, 사진)를 전달한다.  
-      서버로부터 정상 응답을 받으면 `POST /events` API를 호출하면서 이벤트 데이터를 전달한다.
-      
-    - 전달된 이벤트 데이터를 토대로 포인트를 계산한 후 적립한다.
-      
-    - 포인트 조회 API를 호출하면 포인트 증감 히스토리를 보여준다.  
-<br>
-
-### 2. action 데이터에 따른 상이한 접근
-- action이 MOD, DELETE인 경우는 리뷰 작성(ADD)에 대한 포인트 적립이 이미 이루어진 후이므로 API 요청마다 포인트 중복 적립이 일어나지 않도록 한다.
-
-- ADD 일 때: 사용자가 리뷰를 작성한다.
-    - place id를 기준으로 데이터 조회 → user id를 기준으로 중복 리뷰 체크
-    - content 조건 충족 여부 및 점수 부여
-    - photo 첨부 여부 및 점수 부여
-    - 보너스 점수 획득 여부 및 점수 부여
-        - place id를 기준으로 데이터를 뽑았을 때, review id 존재 여부
-        - 첫 리뷰의 시점: 사용자 입장. → 동시성 문제 발생 가능성.
-            - 사용자 A-리뷰 삭제, 사용자 B-리뷰 작성이 동시에 일어난다면 보너스 점수를 계산하는 데 이슈가 생길 수 있음.
-            - POST /events api 호출 → 해당 place id를 기준으로 review id 존재 여부를 확인 (a의 리뷰 존재o) → a가 리뷰를 삭제 → 해당 place id에 review 가 존재하지 않음 → b의 데이터를 리뷰 데이터베이스에 저장 → b는 보너스 점수를 획득하지 못함.
-            - 위 경우와 a의 리뷰 작성 → b의 리뷰 작성 → a의 리뷰 삭제가 순차적으로 발생한 경우 어떻게 구별할 것인가?
-            
-<br>
-
-- MOD 일 때 : 사용자가 리뷰를 수정한다.
-  - ADD로 보상 점수를 받았을 때
-    - 보상 영역(내용, 사진)과 보상 점수에 대한 데이터가 필요하다.
-    - (내용, 1), (사진, 1) ...
-  
-  - ADD로 보상 점수를 받지않았을 때
-    - (내용, 0), (사진, 0)
-    - **내용이 길어지니 노션에서 정리하고 옮길 것**
     
----
----
+    - CONTENT 로그 기록
+        - status가 ADDED: 컨텐트 조건을 충족하지 않으면 포인트-
+        - status가 CANCELED: 컨텐트 조건을 충족하면 포인트+
 
-  - 기존의 보상 점수에 증감을 한다.
-  - 기존 보상 점수를 유지한다.
-  - 보상 점수는 임계영역이고 동시성 문제에서 자유로울 수 없다. 동기화 처리를 해야 한다.
-    
-    - content 혹은 photo 를 수정(정보 더하기 혹은 줄이기) 한다.
-        - 무 → 유의 경우: 점수 추가 및 데이터 변경
-        - 유 → 유의 경우: 데이터 변경
-    - content 혹은 photo 를 전체 삭제한다.
-        - 유 → 무의 경우: 점수 삭감 및 데이터 변경
+    - PHOTO 로그 기록
+        - status가 ADDED: 포토 조건을 충족하지 않으면 포인트-
+        - status가 CANCELED: 포토 조건을 충족하면 포인트+
 
-            
-<br>
-
-- DELETE 일 때 : 사용자가 리뷰를 삭제한다.
-    - 점수 삭감 및 데이터 삭제
-
-<br>
-
-### 3. 포인트 증감 히스토리 남기기
-
-```java
-[ Points ]
-
-Long id;
-Long totalAmount;
-Long amount;
-String userId;
-String status;  // 적립, 회수, 사용
-String reviewId;
-List<Points> history; // 포인트 히스토리
-```
-- Users 는 rewardsPoint id 를 가지고 있다.
-- POST /events API 호출 시 (포인트 적립 API)
-    - ADD, MOD, DELETE 의 경우 비즈니스 로직 과정 중 점수 계산이 이루어짐.
-    - A의 리뷰 작성 결과 2점을 획득했을 때, 포인트 객체는?
-        - 객체를 생성하고 amount, totalAmoutn, userId, status, reviewId 에 데이터를 매핑한다.
-        - history에 생성된 Points를 add 해준다.
-- GET /events API 호출 시 (포인트 조회 API)
-    - Points 의 history를 보여준다.
-    - 페이징 처리를 어떻게 할 것인지도 생각한다.
-
-<br>
-<br>
-
-## [ 데이터베이스 ]
-    
-
-
-
+- **DELETE 일 때 (리뷰 삭제)**
+    - FIRST REVIEW 로그 기록
+        - status가 ADDED: 포인트를 받은 리뷰를 삭제하므로 포인트-
+    - CONTENT 로그 기록
+        - status가 ADDED: 포인트-
+    - PHOTO 로그 기록
+        - status가 ADDED: 포인트-

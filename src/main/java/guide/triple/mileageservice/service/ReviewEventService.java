@@ -18,14 +18,13 @@ import java.util.List;
 @Service
 public class ReviewEventService {
 
-    private final PointRepository pointRep;
-    private final PointLogRepository pointLogRep;
-
+    private final PointRepository pointRepository;
+    private final PointLogRepository pointLogRepository;
 
     @Transactional
     public Boolean createEvent(ReviewEvent reviewEvent) {
-        Point point = pointRep.findByUserId(reviewEvent.getUserId());
-        List<PointLog> pointLogs = pointLogRep.findByPlaceIdAndPointId(reviewEvent.getPlaceId(), point.getId());
+        Point point = pointRepository.findByUserId(reviewEvent.getUserId());
+        List<PointLog> pointLogs = pointLogRepository.findByPlaceIdAndPointId(reviewEvent.getPlaceId(), point.getId());
         PointLogs pointTransactionLogs = new PointLogs(pointLogs);
 
         if (reviewEvent.isActionAdd()) {
@@ -39,18 +38,18 @@ public class ReviewEventService {
         if (reviewEvent.isActionMod()) {
             if (pointTransactionLogs.pointTxStatusIsAdded(PointDetails.CONTENT)) {
                 processMinusContentPoint(point, reviewEvent);
-            }else {
+            } else {
                 processPlusContentPoint(point, reviewEvent);
             }
 
             if (pointTransactionLogs.pointTxStatusIsAdded(PointDetails.PHOTO)) {
                 processMinusPhotoPoint(point, reviewEvent);
-            }else {
+            } else {
                 processPlusPhotoPoint(point, reviewEvent);
             }
         }
 
-        if (reviewEvent.actionIsDelete()) {
+        if (reviewEvent.isActionDelete()) {
             checkFirstReviewByPlaceAndUser(pointTransactionLogs, point, reviewEvent);
             checkAddedPointTxByContent(pointTransactionLogs, point, reviewEvent);
             checkAddedPointTxByPhoto(pointTransactionLogs, point, reviewEvent);
@@ -91,7 +90,7 @@ public class ReviewEventService {
     }
 
     private void checkFirstReviewByPlace(Point point, ReviewEvent reviewEvent) {
-        PointLogs pointLogsByPlace = new PointLogs(pointLogRep.findByPlaceId(reviewEvent.getPlaceId()));
+        PointLogs pointLogsByPlace = new PointLogs(pointLogRepository.findByPlaceId(reviewEvent.getPlaceId()));
 
         if (!pointLogsByPlace.pointTxStatusIsAdded(PointDetails.FIRST_REVIEW)) {
             processPlusFirstReviewPoint(point, reviewEvent);
@@ -99,40 +98,37 @@ public class ReviewEventService {
     }
 
     private void processMinusFirstReviewPoint(Point point, ReviewEvent reviewEvent) {
-        pointLogRep.save(point.minusPointByFirstReview(reviewEvent));
+        pointLogRepository.save(point.minusPointByFirstReview(reviewEvent));
     }
 
     private void processPlusFirstReviewPoint(Point point, ReviewEvent reviewEvent) {
-        pointLogRep.save(point.plusPointByFirstReview(reviewEvent));
+        pointLogRepository.save(point.plusPointByFirstReview(reviewEvent));
 
     }
 
-
     private void processMinusPhotoPoint(Point point, ReviewEvent reviewEvent) {
         if (!reviewEvent.hasAttachedPhoto()) {
-            pointLogRep.save(point.minusPointByPhoto(reviewEvent));
+            pointLogRepository.save(point.minusPointByPhoto(reviewEvent));
         }
     }
 
     private void processMinusContentPoint(Point point, ReviewEvent reviewEvent) {
         if (!reviewEvent.hasContent()) {
             log.info("내용이 {}자 이므로 리뷰 내용 포인트를 회수합니다.", reviewEvent.getContent().length());
-            pointLogRep.save(point.minusPointByContent(reviewEvent));
+            pointLogRepository.save(point.minusPointByContent(reviewEvent));
         }
     }
 
     private void processPlusPhotoPoint(Point point, ReviewEvent reviewEvent) {
         if (reviewEvent.hasAttachedPhoto()) {
-            pointLogRep.save(point.plusPointByPhoto(reviewEvent));
+            pointLogRepository.save(point.plusPointByPhoto(reviewEvent));
         }
     }
 
     private void processPlusContentPoint(Point point, ReviewEvent reviewEvent) {
         if (reviewEvent.hasContent()) {
             log.info("내용이 {}자 이므로 리뷰 내용 포인트를 적립합니다.", reviewEvent.getContent().length());
-            pointLogRep.save(point.plusPointByContent(reviewEvent));
+            pointLogRepository.save(point.plusPointByContent(reviewEvent));
         }
     }
-
 }
-
